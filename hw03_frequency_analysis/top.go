@@ -12,11 +12,6 @@ func Top10(sss string) []string {
 		return []string{}
 	}
 
-	type ams struct {
-		key   string
-		value int
-	}
-	var sam []ams
 	var out []string
 
 	re := regexp.MustCompile(`\s+`)
@@ -26,8 +21,17 @@ func Top10(sss string) []string {
 		asm[sm[i]]++
 	}
 
+	type ams struct {
+		key   string
+		value int
+	}
+
+	sam := make([]ams, len(asm))
+
+	i := 0
 	for k, v := range asm {
-		sam = append(sam, ams{k, v})
+		sam[i] = ams{k, v}
+		i++
 	}
 
 	sort.Slice(sam, func(i, j int) bool {
