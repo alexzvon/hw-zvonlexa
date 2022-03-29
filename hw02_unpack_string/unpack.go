@@ -82,13 +82,13 @@ func validate(s string) error {
 
 func concat(s ...string) string {
 	var builder strings.Builder
-	var lenght int
+	var count int
 
 	for _, v := range s {
-		lenght += len(v)
+		count += len(v)
 	}
 
-	builder.Grow(lenght)
+	builder.Grow(count)
 
 	for _, v := range s {
 		builder.WriteString(v)
