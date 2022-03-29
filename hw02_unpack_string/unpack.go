@@ -41,11 +41,11 @@ func Unpack(in string) (string, error) {
 				return "", err
 			}
 
-			ss += strings.Repeat(string(sr[i]), j)
+			ss = concat(ss, strings.Repeat(string(sr[i]), j))
 
 			i++
 		} else {
-			ss += string(sr[i])
+			ss = concat(ss, string(sr[i]))
 		}
 	}
 
@@ -78,4 +78,21 @@ func validate(s string) error {
 	}
 
 	return nil
+}
+
+func concat(s ...string) string {
+	var builder strings.Builder
+	var lenght int
+
+	for _, v := range s {
+		lenght += len(v)
+	}
+
+	builder.Grow(lenght)
+
+	for _, v := range s {
+		builder.WriteString(v)
+	}
+
+	return builder.String()
 }
