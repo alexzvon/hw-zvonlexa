@@ -5,6 +5,8 @@ import (
 	"sort"
 )
 
+var re = regexp.MustCompile(`\s+`)
+
 func Top10(sss string) []string {
 	asm := make(map[string]int)
 
@@ -14,10 +16,9 @@ func Top10(sss string) []string {
 
 	var out []string
 
-	re := regexp.MustCompile(`\s+`)
 	sm := re.Split(sss, -1)
 
-	for i := 0; i < len(sm)-1; i++ {
+	for i := 0; i < len(sm); i++ {
 		asm[sm[i]]++
 	}
 
@@ -30,45 +31,24 @@ func Top10(sss string) []string {
 
 	i := 0
 	for k, v := range asm {
-		sam[i] = ams{k, v}
+		sam[i] = ams{key: k, value: v}
 		i++
 	}
 
 	sort.Slice(sam, func(i, j int) bool {
-		return sam[i].value > sam[j].value
+		if sam[i].value > sam[j].value {
+			return true
+		}
+
+		if sam[i].value == sam[j].value {
+			return sam[i].key < sam[j].key
+		}
+
+		return false
 	})
 
-	var val, count, start, end int
-
 	for i := 0; i < 10; i++ {
-		if val == 0 {
-			val = sam[i].value
-			start = i
-		}
-
-		if val != sam[i].value {
-			end = i
-			val = sam[i].value
-
-			if count > 1 {
-				sort.Slice(out[start:end], func(i, j int) bool {
-					return out[i+start] < out[j+start]
-				})
-			}
-
-			start = i
-			count = 0
-		}
-
-		count++
 		out = append(out, sam[i].key)
-	}
-
-	if count > 1 {
-		end = 10
-		sort.Slice(out[start:end], func(i, j int) bool {
-			return out[i+start] < out[j+start]
-		})
 	}
 
 	return out
