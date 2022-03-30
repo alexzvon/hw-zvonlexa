@@ -43,3 +43,25 @@ func TestUnpackInvalidString(t *testing.T) {
 		})
 	}
 }
+
+func TestConcat(t *testing.T) {
+	tests := []struct {
+		input1 string
+		input2 string
+		input3 string
+		expect string
+	}{
+		{input1: "a4bc2d5e", input2: "", input3: "abccd", expect: "a4bc2d5eabccd"},
+		{input1: "a4bc2d5e", input2: "abccd", input3: "", expect: "a4bc2d5eabccd"},
+		{input1: "", input2: "a4bc2d5e", input3: "abccd", expect: "a4bc2d5eabccd"},
+	}
+
+	for _, tc := range tests {
+		//		tc := tc
+		t.Run(tc.expect, func(t *testing.T) {
+			result := concat(tc.input1, tc.input2, tc.input3)
+			//			require.NoError(t, err)
+			require.Equal(t, tc.expect, result)
+		})
+	}
+}
