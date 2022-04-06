@@ -79,4 +79,20 @@ func TestTop10(t *testing.T) {
 			require.Equal(t, expected, Top10(text))
 		}
 	})
+
+	t.Run("sort lexicographically", func(t *testing.T) {
+		expected := []string{
+			"а",
+			"б",
+			"в",
+			"г",
+			"д",
+			"е",
+			"ж",
+			"з",
+			"и",
+			"к",
+		}
+		require.Equal(t, expected, Top10(`б д а к г е и з ж в`))
+	})
 }
