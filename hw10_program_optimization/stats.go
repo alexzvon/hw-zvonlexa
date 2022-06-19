@@ -5,18 +5,10 @@ import (
 	"errors"
 	"io"
 	"strings"
-
-	jsoniter "github.com/json-iterator/go"
 )
 
 type User struct {
-	ID       int
-	Name     string
-	Username string
-	Email    string
-	Phone    string
-	Password string
-	Address  string
+	Email string
 }
 
 type DomainStat map[string]int
@@ -30,11 +22,11 @@ func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
 
 	result := make(DomainStat)
 	scanner := bufio.NewScanner(r)
-	json := jsoniter.ConfigFastest
 
 	for scanner.Scan() {
 		line := scanner.Bytes()
-		err := json.Unmarshal(line, &user)
+
+		err := user.UnmarshalJSON(line)
 		if err != nil {
 			return result, err
 		}
