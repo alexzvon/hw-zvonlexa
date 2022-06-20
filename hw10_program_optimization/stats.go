@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+const (
+	dog = byte('@')
+)
+
 type User struct {
 	Email string
 }
@@ -32,7 +36,9 @@ func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
 		}
 
 		if strings.HasSuffix(user.Email, domain) {
-			result[strings.ToLower(strings.SplitN(user.Email, "@", 2)[1])]++
+			n := strings.IndexByte(user.Email, dog) + 1
+
+			result[strings.ToLower(user.Email[n:])]++
 		}
 	}
 
