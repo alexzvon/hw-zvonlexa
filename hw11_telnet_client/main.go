@@ -21,12 +21,16 @@ func main() {
 	args := flag.Args()
 
 	if len(args) != 2 {
-		log.Fatalln("Неверный вызов\n\nПримеры вызовов:\n$ go-telnet --timeout=10s host port\n$ go-telnet mysite.ru 8080\n$ go-telnet --timeout=3s 1.1.1.1 123")
+		log.Fatalln(
+			"Неверный вызов\n\n",
+			"Примеры вызовов:\n",
+			"$ go-telnet --timeout=10s host port\n",
+			"$ go-telnet mysite.ru 8080\n",
+			"$ go-telnet --timeout=3s 1.1.1.1 123",
+		)
 	}
 
-	var address string
-
-	address = net.JoinHostPort(args[0], args[1])
+	address := net.JoinHostPort(args[0], args[1])
 
 	client := NewTelnetClient(address, timeout, os.Stdin, os.Stdout)
 	if err := client.Connect(); err != nil {

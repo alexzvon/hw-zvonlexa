@@ -93,13 +93,13 @@ func (c *Client) Close() error {
 
 func concat(s ...string) string {
 	var builder strings.Builder
-	var lenght int
+	var lt int
 
 	for _, v := range s {
-		lenght += len(v)
+		lt += len(v)
 	}
 
-	builder.Grow(lenght)
+	builder.Grow(lt)
 
 	for _, v := range s {
 		builder.WriteString(v)
