@@ -1,0 +1,28 @@
+server:
+  host: "localhost"
+  port: "8889"
+  timeout:
+    read: 10
+    write: 10
+
+logger:
+  path: "log/log.txt"
+
+db:
+  postgres:
+    driver: "postgres"
+    dsn:
+      host: "localhost"
+      port: "5432"
+      dbname: "postgres"
+      user: "postgres"
+      password: "qazwsxedc"
+      sslmode: "disable"
+      search_path: "public"
+    maxconns: 10
+    minconns: 3
+  memory:
+    maxsize: 20
+
+repository:
+  type: "memory"
