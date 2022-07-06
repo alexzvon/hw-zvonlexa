@@ -8,7 +8,7 @@ import (
 
 	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/config"
 	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/helper"
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/model"
+	model "github.com/fixme_my_friend/hw12_13_14_15_calendar/models"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/pkg/errors"
@@ -77,16 +77,16 @@ func (s *SQLStorage) Create(ctx context.Context, event model.Event) (uint, error
 
 	params := []interface{}{
 		event.Title,
-		event.StartTime,
-		event.EndTime,
+		event.StartDT,
+		event.EndDT,
 		event.Description,
 		event.UserID,
-		event.NotificationTime,
+		event.NotifDT,
 	}
 
 	sqlstr := helper.ConCat(
 		"INSERT INTO public.event ",
-		"(title, starttime, endtime, description, user_id, notification_time) ",
+		"(title, start_dt, end_dt, description, user_id, notif_dt) ",
 		"VALUES ($1, $2, $3, $4, $5, $6) ",
 		"RETURNING id;",
 	)
@@ -122,23 +122,23 @@ func (s *SQLStorage) Update(ctx context.Context, event model.Event) error {
 
 	params := []interface{}{
 		event.Title,
-		event.StartTime,
-		event.EndTime,
+		event.StartDT,
+		event.EndDT,
 		event.Description,
 		event.UserID,
-		event.NotificationTime,
+		event.NotifDT,
 		event.ID,
 	}
 
 	sqlstr := helper.ConCat(
 		"UPDATE public.event SET ",
 		"title=$1, ",
-		"starttime=$2, ",
-		"endtime=$3, ",
+		"start_dt=$2, ",
+		"end_dt=$3, ",
 		"description=$4, ",
 		"user_id=$5, ",
-		"notification_time=$6 ",
-		"WHERE id = $7",
+		"notif_dt=$6 ",
+		"WHERE id = $7;",
 	)
 
 	_, err = tx.Exec(ctx, sqlstr, params)
@@ -160,7 +160,7 @@ func (s *SQLStorage) Delete(ctx context.Context, eventID uint) error {
 	}
 	defer conn.Release()
 
-	sqlstr := "DELETE FROM public.event WHERE id = $1"
+	sqlstr := "DELETE FROM public.event WHERE id = $1;"
 
 	_, err = conn.Exec(ctx, sqlstr, eventID)
 	if err != nil {
@@ -183,11 +183,11 @@ func (s *SQLStorage) GetEventByID(ctx context.Context, eventID uint) (model.Even
 		"SELECT ",
 		"id, ",
 		"title, ",
-		"start_time, ",
-		"end_time, ",
+		"start_dt, ",
+		"end_dt, ",
 		"description, ",
 		"user_id, ",
-		"notification_time ",
+		"notif_dt, ",
 		"FROM public.event WHERE id = $1",
 	)
 
@@ -214,11 +214,11 @@ func (s *SQLStorage) GetEventsByParams(ctx context.Context, args map[string]inte
 		"SELECT ",
 		"id, ",
 		"title, ",
-		"start_time, ",
-		"end_time, ",
+		"start_dt, ",
+		"end_dt, ",
 		"description, ",
 		"user_id, ",
-		"notification_time ",
+		"notif_dt ",
 		"FROM public.event WHERE 1 ",
 	)
 
@@ -250,15 +250,15 @@ func (s *SQLStorage) GetEventsByParams(ctx context.Context, args map[string]inte
 		params = append(params, userID)
 	}
 
-	if startTime, ok := args["start_time"].(time.Time); ok {
+	if startTime, ok := args["start_dt"].(time.Time); ok {
 		nP++
-		sqlstr = helper.ConCat(sqlstr, " and start_time = $", strconv.Itoa(nP))
+		sqlstr = helper.ConCat(sqlstr, " and start_dt = $", strconv.Itoa(nP))
 		params = append(params, startTime)
 	}
 
-	if endTime, ok := args["end_time"].(time.Time); ok {
+	if endTime, ok := args["end_dt"].(time.Time); ok {
 		nP++
-		sqlstr = helper.ConCat(sqlstr, " and start_time = $", strconv.Itoa(nP))
+		sqlstr = helper.ConCat(sqlstr, " and start_dt = $", strconv.Itoa(nP))
 		params = append(params, endTime)
 	}
 
@@ -276,11 +276,11 @@ func (s *SQLStorage) GetEventsByParams(ctx context.Context, args map[string]inte
 		if err := rows.Scan(
 			&e.ID,
 			&e.Title,
-			&e.StartTime,
-			&e.EndTime,
+			&e.StartDT,
+			&e.EndDT,
 			&e.Description,
 			&e.UserID,
-			&e.NotificationTime,
+			&e.NotifDT,
 		); err != nil {
 			return nil, errors.Wrap(err, "cannot scan")
 		}
@@ -293,4 +293,89 @@ func (s *SQLStorage) GetEventsByParams(ctx context.Context, args map[string]inte
 	}
 
 	return result, nil
+}
+
+func (s *SQLStorage) ListEventsToDay(ctx context.Context, dt time.Time) ([]model.Event, error) {
+	sql := "SELECT * FROM public.event WHERE start_dt=$1;"
+
+	params := make([]interface{}, 0)
+	params = append(params, dt)
+
+	events, err := s.rowsSelect(ctx, sql, params)
+	if err != nil {
+		return nil, errors.Wrap(err, "cannot rows select")
+	}
+
+	return events, nil
+}
+
+func (s *SQLStorage) ListEventsToWeek(ctx context.Context, dt time.Time) ([]model.Event, error) {
+	sql := "SELECT * FROM public.event WHERE start_dt<$1 AND start_dt>$2;"
+
+	params := make([]interface{}, 0)
+	params = append(params, dt)
+	params = append(params, dt.Add(7))
+
+	events, err := s.rowsSelect(ctx, sql, params)
+	if err != nil {
+		return nil, errors.Wrap(err, "cannot rows select")
+	}
+
+	return events, nil
+}
+
+func (s *SQLStorage) ListEventsToMonth(ctx context.Context, dt time.Time) ([]model.Event, error) {
+	sql := "SELECT * FROM public.event WHERE start_dt<$1 AND start_dt>$2;"
+
+	params := make([]interface{}, 0)
+	params = append(params, dt)
+	params = append(params, dt.Add(30))
+
+	events, err := s.rowsSelect(ctx, sql, params)
+	if err != nil {
+		return nil, errors.Wrap(err, "cannot rows select")
+	}
+
+	return events, nil
+}
+
+func (s *SQLStorage) rowsSelect(ctx context.Context, sql string, params []interface{}) ([]model.Event, error) {
+	var events []model.Event
+
+	conn, err := s.pool.Acquire(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "cannot open connect")
+	}
+	defer conn.Release()
+
+	rows, err := conn.Query(ctx, sql, params)
+	if err != nil {
+		return nil, errors.Wrap(err, "cannot select")
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		event := model.Event{}
+
+		err := rows.Scan(
+			&event.ID,
+			&event.Title,
+			&event.StartDT,
+			&event.EndDT,
+			&event.NotifDT,
+			&event.UserID,
+			&event.Description,
+		)
+		if err != nil {
+			return nil, errors.Wrap(err, "cannot scan")
+		}
+
+		events = append(events, event)
+	}
+
+	if rows.Err() != nil {
+		return nil, errors.Wrap(err, "cannot rows")
+	}
+
+	return events, nil
 }

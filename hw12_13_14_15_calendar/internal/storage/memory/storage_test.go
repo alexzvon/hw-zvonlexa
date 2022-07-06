@@ -4,9 +4,10 @@ import (
 	"context"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/helper"
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/model"
+	model "github.com/fixme_my_friend/hw12_13_14_15_calendar/models"
 	"github.com/stretchr/testify/require"
 )
 
@@ -23,18 +24,20 @@ func TestStorageNew(t *testing.T) {
 
 func TestStorageCreate(t *testing.T) {
 	t.Run("Create event", func(t *testing.T) {
+		newDT := time.Now()
+
 		conn, err := New(MAXSIZE)
 
 		require.Nil(t, err)
 		require.NotNil(t, conn)
 
 		event := model.Event{
-			Title:            "title",
-			StartTime:        0,
-			EndTime:          0,
-			Description:      "description",
-			UserID:           12,
-			NotificationTime: 17,
+			Title:       "title",
+			StartDT:     newDT,
+			EndDT:       newDT,
+			Description: "description",
+			UserID:      12,
+			NotifDT:     newDT,
 		}
 
 		id, err := conn.Create(context.Background(), event)
@@ -57,50 +60,51 @@ func TestStorageCreate(t *testing.T) {
 }
 
 func TestStorageGetEventByID(t *testing.T) {
+	newDT := time.Now()
 	conn, err := New(MAXSIZE)
 
 	require.Nil(t, err)
 
 	events := []model.Event{
 		{
-			Title:            "title_1",
-			StartTime:        1,
-			EndTime:          1,
-			Description:      "description_1",
-			UserID:           11,
-			NotificationTime: 21,
+			Title:       "title_1",
+			StartDT:     newDT,
+			EndDT:       newDT,
+			Description: "description_1",
+			UserID:      11,
+			NotifDT:     newDT,
 		},
 		{
-			Title:            "title_2",
-			StartTime:        2,
-			EndTime:          2,
-			Description:      "description_2",
-			UserID:           12,
-			NotificationTime: 22,
+			Title:       "title_2",
+			StartDT:     newDT,
+			EndDT:       newDT,
+			Description: "description_2",
+			UserID:      12,
+			NotifDT:     newDT,
 		},
 		{
-			Title:            "title_3",
-			StartTime:        3,
-			EndTime:          3,
-			Description:      "description_3",
-			UserID:           13,
-			NotificationTime: 23,
+			Title:       "title_3",
+			StartDT:     newDT,
+			EndDT:       newDT,
+			Description: "description_3",
+			UserID:      13,
+			NotifDT:     newDT,
 		},
 		{
-			Title:            "title_4",
-			StartTime:        4,
-			EndTime:          4,
-			Description:      "description_4",
-			UserID:           14,
-			NotificationTime: 24,
+			Title:       "title_4",
+			StartDT:     newDT,
+			EndDT:       newDT,
+			Description: "description_4",
+			UserID:      14,
+			NotifDT:     newDT,
 		},
 		{
-			Title:            "title_5",
-			StartTime:        5,
-			EndTime:          5,
-			Description:      "description_5",
-			UserID:           15,
-			NotificationTime: 25,
+			Title:       "title_5",
+			StartDT:     newDT,
+			EndDT:       newDT,
+			Description: "description_5",
+			UserID:      15,
+			NotifDT:     newDT,
 		},
 	}
 
@@ -133,18 +137,19 @@ func TestStorageGetEventByID(t *testing.T) {
 
 func TestStorageUpdate(t *testing.T) {
 	t.Run("Update event", func(t *testing.T) {
+		newDT := time.Now()
 		conn, err := New(MAXSIZE)
 
 		require.Nil(t, err)
 		require.NotNil(t, conn)
 
 		event := model.Event{
-			Title:            "title",
-			StartTime:        0,
-			EndTime:          0,
-			Description:      "description",
-			UserID:           12,
-			NotificationTime: 17,
+			Title:       "title",
+			StartDT:     newDT,
+			EndDT:       newDT,
+			Description: "description",
+			UserID:      12,
+			NotifDT:     newDT,
 		}
 
 		id, err := conn.Create(context.Background(), event)
@@ -153,13 +158,13 @@ func TestStorageUpdate(t *testing.T) {
 		require.Equal(t, uint(1), id)
 
 		eventUpdate := model.Event{
-			ID:               id,
-			Title:            "title_update",
-			StartTime:        10,
-			EndTime:          10,
-			Description:      "description_uptade",
-			UserID:           12,
-			NotificationTime: 17,
+			ID:          id,
+			Title:       "title_update",
+			StartDT:     newDT,
+			EndDT:       newDT,
+			Description: "description_uptade",
+			UserID:      12,
+			NotifDT:     newDT,
 		}
 
 		err = conn.Update(context.Background(), eventUpdate)
@@ -170,29 +175,30 @@ func TestStorageUpdate(t *testing.T) {
 
 		require.Nil(t, err)
 		require.Equal(t, eventUpdate.Title, eventGet.Title)
-		require.Equal(t, eventUpdate.StartTime, eventGet.StartTime)
-		require.Equal(t, eventUpdate.EndTime, eventGet.EndTime)
+		require.Equal(t, eventUpdate.StartDT, eventGet.StartDT)
+		require.Equal(t, eventUpdate.EndDT, eventGet.EndDT)
 		require.Equal(t, eventUpdate.Description, eventGet.Description)
 		require.Equal(t, eventUpdate.UserID, eventGet.UserID)
-		require.Equal(t, eventUpdate.NotificationTime, eventGet.NotificationTime)
+		require.Equal(t, eventUpdate.NotifDT, eventGet.NotifDT)
 
 		conn.Close(context.Background())
 	})
 }
 
 func TestStorageDelete(t *testing.T) {
+	newDT := time.Now()
 	conn, err := New(MAXSIZE)
 
 	require.Nil(t, err)
 	require.NotNil(t, conn)
 
 	event := model.Event{
-		Title:            "title",
-		StartTime:        10,
-		EndTime:          15,
-		Description:      "description",
-		UserID:           11,
-		NotificationTime: 5,
+		Title:       "title",
+		StartDT:     newDT,
+		EndDT:       newDT,
+		Description: "description",
+		UserID:      11,
+		NotifDT:     newDT,
 	}
 
 	id, err := conn.Create(context.Background(), event)

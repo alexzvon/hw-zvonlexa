@@ -3,8 +3,9 @@ package memorystorage
 import (
 	"context"
 	"sync"
+	"time"
 
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/model"
+	model "github.com/fixme_my_friend/hw12_13_14_15_calendar/models"
 	"github.com/pkg/errors"
 )
 
@@ -118,6 +119,42 @@ func (s *MemStorage) GetEventsByParams(ctx context.Context, args map[string]inte
 	return events, nil
 }
 
+func (s *MemStorage) ListEventsToDay(ctx context.Context, dt time.Time) ([]model.Event, error) {
+	var events []model.Event
+
+	for _, e := range s.events {
+		if equalFieldEvent(e, "start_dt", dt) {
+			events = append(events, e)
+		}
+	}
+
+	return events, nil
+}
+
+func (s *MemStorage) ListEventsToWeek(ctx context.Context, dt time.Time) ([]model.Event, error) {
+	et := dt.Add(7)
+
+	for _, e := range s.events {
+		if dt.Before(e.StartDT) && et.After(e.StartDT) {
+			s.events = append(s.events, e)
+		}
+	}
+
+	return nil, nil
+}
+
+func (s *MemStorage) ListEventsToMonth(ctx context.Context, dt time.Time) ([]model.Event, error) {
+	et := dt.Add(30)
+
+	for _, e := range s.events {
+		if dt.Before(e.StartDT) && et.After(e.StartDT) {
+			s.events = append(s.events, e)
+		}
+	}
+
+	return nil, nil
+}
+
 func (s *MemStorage) findIndexToID(id uint) (int, error) {
 	f := -1
 
@@ -147,20 +184,20 @@ func equalFieldEvent(e model.Event, field string, value interface{}) bool {
 		if e.Title == value.(string) {
 			result = true
 		}
-	case "start_time":
-		if e.StartTime == value.(uint) {
+	case "start_dt":
+		if e.StartDT == value.(time.Time) {
 			result = true
 		}
-	case "end_time":
-		if e.EndTime == value.(uint) {
+	case "end_dt":
+		if e.EndDT == value.(time.Time) {
 			result = true
 		}
 	case "user_id":
 		if e.UserID == value.(uint) {
 			result = true
 		}
-	case "notification_time":
-		if e.NotificationTime == value.(uint) {
+	case "notif_dt":
+		if e.NotifDT == value.(time.Time) {
 			result = true
 		}
 	default:
