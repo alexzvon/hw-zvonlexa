@@ -5,17 +5,17 @@ import (
 	"os"
 	"time"
 
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/helper"
+	"github.com/alexzvon/hw12_13_14_15_calendar/internal/myutils"
 	"github.com/pkg/errors"
 )
 
 type Logger interface {
-	close()
 	Debug(string)
 	Info(string)
 	Warn(string)
 	Error(string)
-	LogHTTPInfo([]string)
+	LogHTTPInfo(string)
+	Close()
 }
 
 type sLogger struct {
@@ -25,31 +25,31 @@ type sLogger struct {
 	file *os.File
 }
 
-func (l *sLogger) LogHTTPInfo(s []string) {
-	l.mes <- helper.ConCat(s...)
+func (l *sLogger) LogHTTPInfo(s string) {
+	l.mes <- s
 }
 
 func (l *sLogger) Debug(mes string) {
 	t := time.Now().Format(time.RFC822)
-	l.mes <- helper.ConCat(t, " DEBUG: ", mes, "\n")
+	l.mes <- myutils.ConCat(t, " DEBUG: ", mes, "\n")
 }
 
 func (l *sLogger) Info(mes string) {
 	t := time.Now().Format(time.RFC822)
-	l.mes <- helper.ConCat(t, " INFO: ", mes, "\n")
+	l.mes <- myutils.ConCat(t, " INFO: ", mes, "\n")
 }
 
 func (l *sLogger) Warn(mes string) {
 	t := time.Now().Format(time.RFC822)
-	l.mes <- helper.ConCat(t, " WARN: ", mes, "\n")
+	l.mes <- myutils.ConCat(t, " WARN: ", mes, "\n")
 }
 
 func (l *sLogger) Error(mes string) {
 	t := time.Now().Format(time.RFC822)
-	l.mes <- helper.ConCat(t, " ERROR: ", mes, "\n")
+	l.mes <- myutils.ConCat(t, " ERROR: ", mes, "\n")
 }
 
-func (l *sLogger) close() {
+func (l *sLogger) Close() {
 	close(l.done)
 
 	if err := l.file.Close(); err != nil {
@@ -91,7 +91,7 @@ func writer(done <-chan struct{}, mes chan string, file *os.File) {
 			default:
 				_, err := file.WriteString(m)
 				if err != nil {
-					bL := []byte(helper.ConCat("Cannot write logger file, message - ", m, "\n"))
+					bL := []byte(myutils.ConCat("Cannot write logger file, message - ", m, "\n"))
 					n, err := os.Stderr.Write(bL)
 					if err != nil {
 						log.Println(err)

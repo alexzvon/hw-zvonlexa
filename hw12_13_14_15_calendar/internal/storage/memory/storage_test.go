@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/helper"
-	model "github.com/fixme_my_friend/hw12_13_14_15_calendar/models"
+	"github.com/alexzvon/hw12_13_14_15_calendar/internal/myutils"
+	model "github.com/alexzvon/hw12_13_14_15_calendar/models"
 	"github.com/stretchr/testify/require"
 )
 
@@ -124,7 +124,7 @@ func TestStorageGetEventByID(t *testing.T) {
 	for _, event := range events {
 		event := event
 
-		t.Run(helper.ConCat("Get By ID", strconv.Itoa(int(event.ID))), func(t *testing.T) {
+		t.Run(myutils.ConCat("Get By ID", strconv.Itoa(int(event.ID))), func(t *testing.T) {
 			eGet, err := conn.GetEventByID(context.Background(), event.ID)
 
 			require.Nil(t, err)

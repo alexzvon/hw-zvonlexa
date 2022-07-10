@@ -13,7 +13,7 @@ CREATE SEQUENCE IF NOT EXISTS public.event_id_seq
 CREATE TABLE IF NOT EXISTS public.event
 (
     id bigint NOT NULL DEFAULT nextval('event_id_seq'::regclass),
-    title character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    "title" text COLLATE pg_catalog."default" NOT NULL,
     user_id bigint NOT NULL,
     start_dt timestamp without time zone NOT NULL,
     end_dt timestamp without time zone NOT NULL,

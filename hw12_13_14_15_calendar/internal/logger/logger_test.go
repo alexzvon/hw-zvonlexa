@@ -17,5 +17,5 @@ func TestLogger(t *testing.T) {
 	logger.Warn("Test Warn Message")
 	logger.Error("Test Error Message")
 
-	logger.close()
+	logger.Close()
 }

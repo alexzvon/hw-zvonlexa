@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/config"
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/helper"
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/logger"
+	"github.com/alexzvon/hw12_13_14_15_calendar/internal/config"
+	"github.com/alexzvon/hw12_13_14_15_calendar/internal/logger"
+	"github.com/alexzvon/hw12_13_14_15_calendar/internal/myutils"
 	"github.com/pkg/errors"
 )
 
@@ -23,57 +23,50 @@ type sHandler struct {
 }
 
 func (h *sHandler) hello(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "GET":
-		w.Header().Set("content-type", "text/plain")
-		w.WriteHeader(http.StatusOK)
+	w.Header().Set("content-type", "text/plain")
+	w.WriteHeader(http.StatusOK)
 
-		strResponse := "hello-world"
-		_, err := w.Write([]byte(strResponse))
-		if err != nil {
-			if h.logger != nil {
-				h.logger.Error(err.Error())
-			}
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		}
-	default:
+	strResponse := "hello-world"
+	_, err := w.Write([]byte(strResponse))
+	if err != nil {
 		if h.logger != nil {
-			h.logger.Error("Only GET allowed")
+			h.logger.Error(err.Error())
 		}
-
-		http.Error(w, "Only GET allowed", http.StatusMethodNotAllowed)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 }
 
 func (h *sHandler) root(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "GET":
-		w.Header().Set("content-type", "text/plain")
-		w.WriteHeader(http.StatusOK)
+	w.Header().Set("content-type", "text/plain")
+	w.WriteHeader(http.StatusOK)
 
-		_, err := w.Write([]byte("Корень"))
-		if err != nil {
-			h.logger.Error(err.Error())
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		}
+	_, err := w.Write([]byte("Корень"))
+	if err != nil {
+		h.logger.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+}
+
+func (h *sHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	switch myutils.ConCat(r.Method, " ", r.URL.Path) {
+	case "GET /":
+		loggingMiddleware(h.logger, h.root)(w, r)
+	case "GET /hello":
+		loggingMiddleware(h.logger, h.hello)(w, r)
 	default:
-		h.logger.Error("Only GET and POST are allowed")
-		http.Error(w, "Only GET and POST are allowed", http.StatusMethodNotAllowed)
+		h.logger.Error("Not Found")
+		http.Error(w, "Not Found", http.StatusNotFound)
 	}
 }
 
 func NewServer(cfg config.Config, logger logger.Logger, app Application) *Server {
-	handler := &sHandler{
+	handlerHTTP := &sHandler{
 		logger: logger,
 	}
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/", loggingMiddleware(logger, handler.root))
-	mux.HandleFunc("/hello", loggingMiddleware(logger, handler.hello))
 
 	server := &http.Server{
-		Addr:         helper.ConCat(cfg.GetString("server.host"), cfg.GetString("server.port")),
-		Handler:      mux,
+		Addr:         myutils.ConCat(cfg.GetString("server.host"), cfg.GetString("server.port")),
+		Handler:      handlerHTTP,
 		ReadTimeout:  time.Duration(cfg.GetInt("servet.timeout.read") * int(time.Second)),
 		WriteTimeout: time.Duration(cfg.GetInt("servet.timeout.write") * int(time.Second)),
 	}
@@ -81,20 +74,12 @@ func NewServer(cfg config.Config, logger logger.Logger, app Application) *Server
 	return &Server{
 		app: app,
 		srv: server,
-		//		logger: logger,
 	}
 }
 
 func (s *Server) Start(ctx context.Context) error {
-	select {
-	case <-ctx.Done():
-		if err := s.Stop(ctx); err != nil {
-			return err
-		}
-	default:
-		if err := s.srv.ListenAndServe(); err != nil {
-			return errors.Wrap(err, "cannot listen http")
-		}
+	if err := s.srv.ListenAndServe(); err != nil {
+		return errors.Wrap(err, "cannot listen http")
 	}
 
 	return nil

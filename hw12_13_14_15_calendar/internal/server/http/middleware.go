@@ -6,16 +6,17 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/logger"
+	"github.com/alexzvon/hw12_13_14_15_calendar/internal/logger"
+	"github.com/alexzvon/hw12_13_14_15_calendar/internal/myutils"
 )
 
 func loggingMiddleware(logg logger.Logger, next http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
 		next(w, r)
 
-		strInfo := []string{
+		strInfo := myutils.ConCat(
 			r.RemoteAddr,
 			" [",
 			start.Format(time.RFC822),
@@ -30,8 +31,8 @@ func loggingMiddleware(logg logger.Logger, next http.HandlerFunc) http.HandlerFu
 			" \"",
 			r.UserAgent(),
 			"\" \n",
-		}
+		)
 
 		logg.LogHTTPInfo(strInfo)
-	})
+	}
 }

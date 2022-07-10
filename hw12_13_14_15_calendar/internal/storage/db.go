@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/config"
-	memorystorage "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/storage/memory"
-	sqlstorage "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/storage/sql"
-	model "github.com/fixme_my_friend/hw12_13_14_15_calendar/models"
+	"github.com/alexzvon/hw12_13_14_15_calendar/internal/config"
+	memorystorage "github.com/alexzvon/hw12_13_14_15_calendar/internal/storage/memory"
+	sqlstorage "github.com/alexzvon/hw12_13_14_15_calendar/internal/storage/sql"
+	model "github.com/alexzvon/hw12_13_14_15_calendar/models"
 	"github.com/pkg/errors"
 )
 
@@ -23,13 +23,11 @@ type Conn interface {
 	ListEventsToDay(ctx context.Context, dt time.Time) ([]model.Event, error)
 	ListEventsToWeek(ctx context.Context, dt time.Time) ([]model.Event, error)
 	ListEventsToMonth(ctx context.Context, dt time.Time) ([]model.Event, error)
-	// GetEventByID(ctx context.Context, eventID uint) (model.Event, error)
-	// GetEventsByParams(ctx context.Context, args map[string]interface{}) ([]model.Event, error)
 	Close(ctx context.Context)
 }
 
 func Connect(cfg config.Config) (Conn, error) {
-	var db interface{}
+	var db Conn
 	var err error
 
 	switch cfg.GetString("repository.type") {
@@ -47,5 +45,5 @@ func Connect(cfg config.Config) (Conn, error) {
 		return nil, errors.New("cannot create repository")
 	}
 
-	return db.(Conn), nil
+	return db, nil
 }

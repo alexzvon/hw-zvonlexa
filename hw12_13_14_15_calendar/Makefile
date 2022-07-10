@@ -1,7 +1,6 @@
 POSTGRESQL_URL := 'pgx://postgres:qazwsxedc@10.10.152.12:5432/db_test?sslmode=disable&search_path=public'
 PATH_PROTO := ./api/calendar/server.proto
 
-
 version: build
 	$(BIN) version
 

@@ -5,13 +5,13 @@ import (
 	"sync"
 	"time"
 
-	model "github.com/fixme_my_friend/hw12_13_14_15_calendar/models"
+	model "github.com/alexzvon/hw12_13_14_15_calendar/models"
 	"github.com/pkg/errors"
 )
 
 type MemStorage struct {
 	mu      sync.RWMutex
-	events  []model.Event
+	events  map[uint]model.Event
 	lastID  uint
 	maxSize int
 }
@@ -24,7 +24,10 @@ func New(maxSize int) (*MemStorage, error) {
 }
 
 func (s *MemStorage) Close(ctx context.Context) {
-	s.events = make([]model.Event, 0)
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	s.events = make(map[uint]model.Event, 0)
 	s.lastID = 0
 	s.maxSize = 0
 }
@@ -35,84 +38,57 @@ func (s *MemStorage) Create(ctx context.Context, event model.Event) (uint, error
 
 	s.lastID++
 	event.ID = s.lastID
-	s.events = append(s.events, event)
+	s.events[event.ID] = event
 
 	return event.ID, nil
 }
 
 func (s *MemStorage) Update(ctx context.Context, event model.Event) error {
-	check := true
+	if _, ok := s.events[event.ID]; ok {
+		s.mu.RLock()
+		s.events[event.ID] = event
+		s.mu.RUnlock()
 
-	for i, e := range s.events {
-		if e.ID == event.ID {
-			s.mu.RLock()
-			s.events[i] = event
-			s.mu.RUnlock()
-			check = false
-			break
-		}
+		return nil
 	}
 
-	if check {
-		return errors.New("no such model")
-	}
-
-	return nil
+	return errors.New("no such model")
 }
 
 func (s *MemStorage) Delete(ctx context.Context, eventID uint) error {
-	findIndex, err := s.findIndexToID(eventID)
-	if err != nil {
-		return errors.Wrap(err, "cannot delete")
+	if _, ok := s.events[eventID]; ok {
+		s.mu.RLock()
+		delete(s.events, eventID)
+		s.mu.RUnlock()
+
+		return nil
 	}
 
-	countEvents := len(s.events)
-	if countEvents == 0 {
-		return errors.New("cannot delete")
-	}
-
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	switch {
-	case findIndex == 0:
-		if countEvents == 1 {
-			s.events = make([]model.Event, 0)
-		} else {
-			s.events = s.events[1:]
-		}
-	case findIndex == countEvents-1:
-		s.events = s.events[:findIndex-1]
-	default:
-		s.events = append(s.events[:findIndex-1], s.events[findIndex+1:]...)
-	}
-
-	return nil
+	return errors.New("no such model")
 }
 
 func (s *MemStorage) GetEventByID(ctx context.Context, eventID uint) (model.Event, error) {
-	findIndex, err := s.findIndexToID(eventID)
-	if err != nil {
-		return model.Event{}, errors.Wrap(err, "cannot delete")
+	if _, ok := s.events[eventID]; ok {
+		return s.events[eventID], nil
 	}
 
-	return s.events[findIndex], nil
+	return model.Event{}, errors.New("no such model")
 }
 
-func (s *MemStorage) GetEventsByParams(ctx context.Context, args map[string]interface{}) ([]model.Event, error) {
+func (s *MemStorage) GetEventsByParams(ctx context.Context, fields map[string]interface{}) ([]model.Event, error) {
 	var events []model.Event
-	countArgs := len(args)
+	countFields := len(fields)
 
-	for _, e := range s.events {
-		b := 0
-		for s, m := range args {
-			if equalFieldEvent(e, s, m) {
-				b++
+	for _, event := range s.events {
+		countEquelField := 0
+		for nameField, valueField := range fields {
+			if equalFieldEvent(event, nameField, valueField) {
+				countEquelField++
 			}
 		}
 
-		if b == countArgs {
-			events = append(events, e)
+		if countEquelField == countFields {
+			events = append(events, event)
 		}
 	}
 
@@ -122,9 +98,9 @@ func (s *MemStorage) GetEventsByParams(ctx context.Context, args map[string]inte
 func (s *MemStorage) ListEventsToDay(ctx context.Context, dt time.Time) ([]model.Event, error) {
 	var events []model.Event
 
-	for _, e := range s.events {
-		if equalFieldEvent(e, "start_dt", dt) {
-			events = append(events, e)
+	for _, event := range s.events {
+		if equalFieldEvent(event, "start_dt", dt) {
+			events = append(events, event)
 		}
 	}
 
@@ -132,72 +108,57 @@ func (s *MemStorage) ListEventsToDay(ctx context.Context, dt time.Time) ([]model
 }
 
 func (s *MemStorage) ListEventsToWeek(ctx context.Context, dt time.Time) ([]model.Event, error) {
+	var events []model.Event
 	et := dt.Add(7)
 
-	for _, e := range s.events {
-		if dt.Before(e.StartDT) && et.After(e.StartDT) {
-			s.events = append(s.events, e)
+	for _, event := range s.events {
+		if dt.Before(event.StartDT) && et.After(event.StartDT) {
+			events = append(events, event)
 		}
 	}
 
-	return nil, nil
+	return events, nil
 }
 
 func (s *MemStorage) ListEventsToMonth(ctx context.Context, dt time.Time) ([]model.Event, error) {
+	var events []model.Event
 	et := dt.Add(30)
 
-	for _, e := range s.events {
-		if dt.Before(e.StartDT) && et.After(e.StartDT) {
-			s.events = append(s.events, e)
+	for _, event := range s.events {
+		if dt.Before(event.StartDT) && et.After(event.StartDT) {
+			events = append(events, event)
 		}
 	}
 
-	return nil, nil
+	return events, nil
 }
 
-func (s *MemStorage) findIndexToID(id uint) (int, error) {
-	f := -1
-
-	for i, e := range s.events {
-		if e.ID == id {
-			f = i
-			break
-		}
-	}
-
-	if f == -1 {
-		return 0, errors.New("no such event")
-	}
-
-	return f, nil
-}
-
-func equalFieldEvent(e model.Event, field string, value interface{}) bool {
+func equalFieldEvent(event model.Event, field string, value interface{}) bool {
 	result := false
 
 	switch field {
 	case "id":
-		if e.ID == value.(uint) {
+		if event.ID == value.(uint) {
 			result = true
 		}
 	case "title":
-		if e.Title == value.(string) {
+		if event.Title == value.(string) {
 			result = true
 		}
 	case "start_dt":
-		if e.StartDT == value.(time.Time) {
+		if event.StartDT == value.(time.Time) {
 			result = true
 		}
 	case "end_dt":
-		if e.EndDT == value.(time.Time) {
+		if event.EndDT == value.(time.Time) {
 			result = true
 		}
 	case "user_id":
-		if e.UserID == value.(uint) {
+		if event.UserID == value.(uint) {
 			result = true
 		}
 	case "notif_dt":
-		if e.NotifDT == value.(time.Time) {
+		if event.NotifDT == value.(time.Time) {
 			result = true
 		}
 	default:
