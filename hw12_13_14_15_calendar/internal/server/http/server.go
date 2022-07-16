@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/config"
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/logger"
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/myutils"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/config"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/logger"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/myutils"
 	"github.com/pkg/errors"
 )
 

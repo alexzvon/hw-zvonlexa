@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/config"
-	memorystorage "github.com/alexzvon/hw12_13_14_15_calendar/internal/storage/memory"
-	sqlstorage "github.com/alexzvon/hw12_13_14_15_calendar/internal/storage/sql"
-	model "github.com/alexzvon/hw12_13_14_15_calendar/models"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/config"
+	memorystorage "github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/storage/memory"
+	sqlstorage "github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/storage/sql"
+	model "github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/models"
 	"github.com/pkg/errors"
 )
 

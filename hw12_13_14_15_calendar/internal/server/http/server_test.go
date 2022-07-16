@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/myutils"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/myutils"
 	"github.com/stretchr/testify/require"
 )
 

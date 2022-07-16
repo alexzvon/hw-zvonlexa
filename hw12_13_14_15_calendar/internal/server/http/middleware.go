@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/logger"
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/myutils"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/logger"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/myutils"
 )
 
 func loggingMiddleware(logg logger.Logger, next http.HandlerFunc) http.HandlerFunc {

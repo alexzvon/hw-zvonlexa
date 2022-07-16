@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	model "github.com/alexzvon/hw12_13_14_15_calendar/models"
+	model "github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/models"
 	"github.com/pkg/errors"
 )
 

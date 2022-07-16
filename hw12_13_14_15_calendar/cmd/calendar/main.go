@@ -9,11 +9,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/app"
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/config"
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/logger"
-	internalhttp "github.com/alexzvon/hw12_13_14_15_calendar/internal/server/http"
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/storage"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/app"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/config"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/logger"
+	internalhttp "github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/server/http"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/storage"
 )
 
 var configFile string

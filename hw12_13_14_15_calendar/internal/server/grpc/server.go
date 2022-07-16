@@ -2,16 +2,16 @@ package internalgrpc
 
 import (
 	"context"
+	"log"
 	"net"
 	"time"
 
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/config"
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/logger"
-	grpcserver "github.com/alexzvon/hw12_13_14_15_calendar/internal/server/grpc/gen"
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/storage"
-	model "github.com/alexzvon/hw12_13_14_15_calendar/models"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/config"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/logger"
+	grpcserver "github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/server/grpc/gen"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/storage"
+	model "github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/models"
 	empty "github.com/golang/protobuf/ptypes/empty"
-	"github.com/prometheus/common/log"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -58,7 +58,7 @@ func unaryInterceptor() grpc.ServerOption {
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
 		start := time.Now()
-		defer log.Infof(
+		defer log.Printf(
 			"%s %v",
 			info.FullMethod,
 			time.Since(start),
@@ -66,7 +66,7 @@ func unaryInterceptor() grpc.ServerOption {
 
 		resp, err := handler(ctx, req)
 		if err != nil {
-			log.Errorf("method %q throws error: %v", info.FullMethod, err)
+			log.Printf("method %q throws error: %v", info.FullMethod, err)
 		}
 
 		return resp, err

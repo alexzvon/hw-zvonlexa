@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/myutils"
-	model "github.com/alexzvon/hw12_13_14_15_calendar/models"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/myutils"
+	model "github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/models"
 	"github.com/stretchr/testify/require"
 )
 

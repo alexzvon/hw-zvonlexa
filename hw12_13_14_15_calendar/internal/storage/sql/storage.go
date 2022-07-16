@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/config"
-	"github.com/alexzvon/hw12_13_14_15_calendar/internal/myutils"
-	model "github.com/alexzvon/hw12_13_14_15_calendar/models"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/config"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/myutils"
+	model "github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/models"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/pkg/errors"
