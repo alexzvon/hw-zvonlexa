@@ -2,12 +2,13 @@ package internalhttp
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"time"
 
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/concat"
 	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/config"
 	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/logger"
-	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/myutils"
 	"github.com/pkg/errors"
 )
 
@@ -30,7 +31,9 @@ func (h *sHandler) hello(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write([]byte(strResponse))
 	if err != nil {
 		if h.logger != nil {
-			h.logger.Error(err.Error())
+			if err := h.logger.Error(err.Error()); err != nil {
+				log.Fatalln(err)
+			}
 		}
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
@@ -42,20 +45,24 @@ func (h *sHandler) root(w http.ResponseWriter, r *http.Request) {
 
 	_, err := w.Write([]byte("Корень"))
 	if err != nil {
-		h.logger.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		if err := h.logger.Error(err.Error()); err != nil {
+			log.Fatalln(err)
+		}
 	}
 }
 
 func (h *sHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch myutils.ConCat(r.Method, " ", r.URL.Path) {
-	case "GET /":
+	switch r.URL.Path {
+	case "/":
 		loggingMiddleware(h.logger, h.root)(w, r)
-	case "GET /hello":
+	case "/hello":
 		loggingMiddleware(h.logger, h.hello)(w, r)
 	default:
-		h.logger.Error("Not Found")
 		http.Error(w, "Not Found", http.StatusNotFound)
+		if err := h.logger.Error("Not Found"); err != nil {
+			log.Fatalln(err)
+		}
 	}
 }
 
@@ -65,7 +72,7 @@ func NewServer(cfg config.Config, logger logger.Logger, app Application) *Server
 	}
 
 	server := &http.Server{
-		Addr:         myutils.ConCat(cfg.GetString("server.host"), cfg.GetString("server.port")),
+		Addr:         concat.ConCat(cfg.GetString("server.host"), cfg.GetString("server.port")),
 		Handler:      handlerHTTP,
 		ReadTimeout:  time.Duration(cfg.GetInt("servet.timeout.read") * int(time.Second)),
 		WriteTimeout: time.Duration(cfg.GetInt("servet.timeout.write") * int(time.Second)),

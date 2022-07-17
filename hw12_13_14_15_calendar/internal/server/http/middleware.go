@@ -2,12 +2,13 @@ package internalhttp
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/concat"
 	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/logger"
-	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/myutils"
 )
 
 func loggingMiddleware(logg logger.Logger, next http.HandlerFunc) http.HandlerFunc {
@@ -16,7 +17,7 @@ func loggingMiddleware(logg logger.Logger, next http.HandlerFunc) http.HandlerFu
 
 		next(w, r)
 
-		strInfo := myutils.ConCat(
+		strInfo := concat.ConCat(
 			r.RemoteAddr,
 			" [",
 			start.Format(time.RFC822),
@@ -33,6 +34,8 @@ func loggingMiddleware(logg logger.Logger, next http.HandlerFunc) http.HandlerFu
 			"\" \n",
 		)
 
-		logg.LogHTTPInfo(strInfo)
+		if err := logg.LogHTTPInfo(strInfo); err != nil {
+			log.Fatalln(err)
+		}
 	}
 }

@@ -1,4 +1,4 @@
-package myutils
+package concat
 
 import "strings"
 

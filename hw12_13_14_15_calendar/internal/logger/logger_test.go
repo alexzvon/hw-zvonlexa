@@ -12,10 +12,17 @@ func TestLogger(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, logger)
 
-	logger.Debug("Test Debug Message")
-	logger.Info("Test Info Message")
-	logger.Warn("Test Warn Message")
-	logger.Error("Test Error Message")
+	err = logger.Debug("Test Debug Message")
+	require.Nil(t, err)
+
+	err = logger.Info("Test Info Message")
+	require.Nil(t, err)
+
+	err = logger.Warn("Test Warn Message")
+	require.Nil(t, err)
+
+	err = logger.Error("Test Error Message")
+	require.Nil(t, err)
 
 	logger.Close()
 }

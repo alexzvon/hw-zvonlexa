@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/myutils"
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/concat"
 	"github.com/stretchr/testify/require"
 )
 
@@ -46,7 +46,7 @@ func TestNewServer(t *testing.T) {
 		cli := http.DefaultClient
 		ctx := context.Background()
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, myutils.ConCat(ts.URL, "/hello"), nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, concat.ConCat(ts.URL, "/hello"), nil)
 
 		require.Nil(t, err)
 

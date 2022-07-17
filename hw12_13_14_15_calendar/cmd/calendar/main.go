@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"log"
-	"os"
 	"os/signal"
 	"syscall"
 	"time"
@@ -42,7 +41,9 @@ func main() {
 
 	conn, err := storage.Connect(cfg)
 	if err != nil {
-		logg.Error(err.Error())
+		if err := logg.Error(err.Error()); err != nil {
+			log.Fatalln(err)
+		}
 	}
 
 	calendar := app.New(logg, conn)
@@ -60,15 +61,20 @@ func main() {
 		defer cancel()
 
 		if err := server.Stop(ctx); err != nil {
-			logg.Error("failed to stop http server: " + err.Error())
+			if err := logg.Error("failed to stop http server: " + err.Error()); err != nil {
+				log.Fatalln(err)
+			}
 		}
 	}()
 
-	logg.Info("calendar is running...")
+	if err := logg.Info("calendar is running..."); err != nil {
+		log.Println(err)
+		return
+	}
 
 	if err := server.Start(ctx); err != nil {
-		logg.Error("failed to start http server: " + err.Error())
-		cancel()
-		os.Exit(1) //nolint:gocritic
+		if err := logg.Error("failed to start http server: " + err.Error()); err != nil {
+			log.Println(err)
+		}
 	}
 }

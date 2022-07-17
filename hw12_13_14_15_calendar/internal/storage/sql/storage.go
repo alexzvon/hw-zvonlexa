@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/concat"
 	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/config"
-	"github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/internal/myutils"
 	model "github.com/alexzvon/hw-zvonlexa/hw12_13_14_15_calendar/models"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -66,7 +66,7 @@ func (s *SQLStorage) Create(ctx context.Context, event model.Event) (uint, error
 			event.NotifDT,
 		}
 
-		sqlstr := myutils.ConCat(
+		sqlstr := concat.ConCat(
 			"INSERT INTO public.event ",
 			"(title, start_dt, end_dt, description, user_id, notif_dt) ",
 			"VALUES ($1, $2, $3, $4, $5, $6) ",
@@ -100,7 +100,7 @@ func (s *SQLStorage) Update(ctx context.Context, event model.Event) error {
 			event.ID,
 		}
 
-		sqlstr := myutils.ConCat(
+		sqlstr := concat.ConCat(
 			"UPDATE public.event SET ",
 			"title=$1, ",
 			"start_dt=$2, ",
@@ -147,7 +147,7 @@ func (s *SQLStorage) GetEventByID(ctx context.Context, eventID uint) (model.Even
 	var result model.Event
 
 	f := func(conn *pgxpool.Conn) error {
-		sqlstr := myutils.ConCat(
+		sqlstr := concat.ConCat(
 			"SELECT ",
 			"id, ",
 			"title, ",
@@ -190,7 +190,7 @@ func (s *SQLStorage) GetEventsByParams(ctx context.Context, args map[string]inte
 		&event.NotifDT,
 	}
 
-	sqlstr := myutils.ConCat(
+	sqlstr := concat.ConCat(
 		"SELECT ",
 		"id, ",
 		"title, ",
@@ -204,45 +204,45 @@ func (s *SQLStorage) GetEventsByParams(ctx context.Context, args map[string]inte
 
 	if id, ok := args["id"].(int); ok {
 		nP++
-		sqlstr = myutils.ConCat(sqlstr, " and id = $", strconv.Itoa(nP))
+		sqlstr = concat.ConCat(sqlstr, " and id = $", strconv.Itoa(nP))
 		params = append(params, id)
 	}
 
 	if ids, ok := args["ids"].([]int); ok {
 		var sids string
 		nP++
-		sqlstr = myutils.ConCat(sqlstr, " and id IN ($", strconv.Itoa(nP), ")")
+		sqlstr = concat.ConCat(sqlstr, " and id IN ($", strconv.Itoa(nP), ")")
 		for _, id := range ids {
-			sids = myutils.ConCat(sids, strconv.Itoa(id), ",")
+			sids = concat.ConCat(sids, strconv.Itoa(id), ",")
 		}
 		params = append(params, sqlstr)
 	}
 
 	if title, ok := args["title"].(string); ok {
 		nP++
-		sqlstr = myutils.ConCat(sqlstr, " and title = $", strconv.Itoa(nP))
+		sqlstr = concat.ConCat(sqlstr, " and title = $", strconv.Itoa(nP))
 		params = append(params, title)
 	}
 
 	if userID, ok := args["user_id"].(int); ok {
 		nP++
-		sqlstr = myutils.ConCat(sqlstr, " and user_id = $", strconv.Itoa(nP))
+		sqlstr = concat.ConCat(sqlstr, " and user_id = $", strconv.Itoa(nP))
 		params = append(params, userID)
 	}
 
 	if startTime, ok := args["start_dt"].(time.Time); ok {
 		nP++
-		sqlstr = myutils.ConCat(sqlstr, " and start_dt = $", strconv.Itoa(nP))
+		sqlstr = concat.ConCat(sqlstr, " and start_dt = $", strconv.Itoa(nP))
 		params = append(params, startTime)
 	}
 
 	if endTime, ok := args["end_dt"].(time.Time); ok {
 		nP++
-		sqlstr = myutils.ConCat(sqlstr, " and start_dt = $", strconv.Itoa(nP))
+		sqlstr = concat.ConCat(sqlstr, " and start_dt = $", strconv.Itoa(nP))
 		params = append(params, endTime)
 	}
 
-	sqlstr = myutils.ConCat(sqlstr, ";")
+	sqlstr = concat.ConCat(sqlstr, ";")
 
 	f := func(pgx.QueryFuncRow) error {
 		result = append(result, event)
