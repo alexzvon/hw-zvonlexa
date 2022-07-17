@@ -2,6 +2,7 @@ package internalhttp
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"time"
 
@@ -30,7 +31,9 @@ func (h *sHandler) hello(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write([]byte(strResponse))
 	if err != nil {
 		if h.logger != nil {
-			h.logger.Error(err.Error())
+			if err := h.logger.Error(err.Error()); err != nil {
+				log.Fatalln(err)
+			}
 		}
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
@@ -42,8 +45,10 @@ func (h *sHandler) root(w http.ResponseWriter, r *http.Request) {
 
 	_, err := w.Write([]byte("Корень"))
 	if err != nil {
-		h.logger.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		if err := h.logger.Error(err.Error()); err != nil {
+			log.Fatalln(err)
+		}
 	}
 }
 
@@ -54,8 +59,10 @@ func (h *sHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "/hello":
 		loggingMiddleware(h.logger, h.hello)(w, r)
 	default:
-		h.logger.Error("Not Found")
 		http.Error(w, "Not Found", http.StatusNotFound)
+		if err := h.logger.Error("Not Found"); err != nil {
+			log.Fatalln(err)
+		}
 	}
 }
 

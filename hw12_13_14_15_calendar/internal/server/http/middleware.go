@@ -2,6 +2,7 @@ package internalhttp
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -33,6 +34,8 @@ func loggingMiddleware(logg logger.Logger, next http.HandlerFunc) http.HandlerFu
 			"\" \n",
 		)
 
-		logg.LogHTTPInfo(strInfo)
+		if err := logg.LogHTTPInfo(strInfo); err != nil {
+			log.Fatalln(err)
+		}
 	}
 }
