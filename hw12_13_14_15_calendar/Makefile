@@ -47,6 +47,9 @@ migrate-up:
 migrate-down:
 	migrate -database $(POSTGRESQL_URL) -path ./migrate/calendar down
 
+test:
+	go test -race ./internal/... ./pkg/...
+
 install-lint-deps:
 	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin v1.46.2
 
