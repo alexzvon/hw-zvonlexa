@@ -1,3 +1,8 @@
+ifndef $(GOPATH)
+    GOPATH=$(shell go env GOPATH)
+    export GOPATH
+endif
+
 POSTGRESQL_URL := 'pgx://postgres:qazwsxedc@10.10.152.12:5432/db_test?sslmode=disable&search_path=public'
 PATH_PROTO := ./api/calendar/server.proto
 
@@ -43,7 +48,7 @@ migrate-down:
 	migrate -database $(POSTGRESQL_URL) -path ./migrate/calendar down
 
 install-lint-deps:
-	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.46.2	
+	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin v1.46.2
 
 lint: install-lint-deps
 	golangci-lint run ./...
