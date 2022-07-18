@@ -20,10 +20,10 @@ func TestNew(t *testing.T) {
 
 	require.Equal(t, "postgres", cfg.GetString("db.postgres.driver"))
 	require.Equal(t, "localhost", cfg.GetString("db.postgres.dsn.host"))
-	require.Equal(t, 5401, cfg.GetInt("db.postgres.dsn.port"))
+	require.Equal(t, 5432, cfg.GetInt("db.postgres.dsn.port"))
 	require.Equal(t, "postgres", cfg.GetString("db.postgres.dsn.user"))
 	require.Equal(t, "postgres", cfg.GetString("db.postgres.dsn.password"))
-	require.Equal(t, "disable", cfg.GetString("db.postgres.sslmode"))
+	require.Equal(t, "disable", cfg.GetString("db.postgres.dsn.sslmode"))
 	require.Equal(t, 10, cfg.GetInt("db.postgres.maxconns"))
 	require.Equal(t, 3, cfg.GetInt("db.postgres.minconns"))
 

@@ -19,6 +19,7 @@ type MemStorage struct {
 func New(maxSize int) (*MemStorage, error) {
 	return &MemStorage{
 		mu:      sync.RWMutex{},
+		events:  make(map[uint]model.Event),
 		maxSize: maxSize,
 	}, nil
 }

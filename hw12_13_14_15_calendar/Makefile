@@ -9,9 +9,6 @@ PATH_PROTO := ./api/calendar/server.proto
 version: build
 	$(BIN) version
 
-test:
-	go test -race ./internal/... ./pkg/...
-
 gen-grpc:
 	protoc -I . --go_out . --go-grpc_out . $(PATH_PROTO)
 
@@ -48,7 +45,7 @@ migrate-down:
 	migrate -database $(POSTGRESQL_URL) -path ./migrate/calendar down
 
 test:
-	go test -race ./internal/... ./pkg/...
+	go test -v -race -gcflags=-l -timeout=30s ./...
 
 install-lint-deps:
 	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin v1.46.2

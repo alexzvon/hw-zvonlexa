@@ -95,7 +95,7 @@ func TestHandlerRoot(t *testing.T) {
 		body, err := ioutil.ReadAll(w.Body)
 
 		require.Nil(t, err)
-		require.Equal(t, string(body), "Only GET allowed\n")
+		require.Equal(t, string(body), "Корень")
 
 		result.Body.Close()
 	})
@@ -128,12 +128,12 @@ func TestHandlerHello(t *testing.T) {
 		handler.hello(w, r)
 		result := w.Result()
 
-		require.Equal(t, http.StatusMethodNotAllowed, result.StatusCode)
+		require.Equal(t, http.StatusOK, result.StatusCode)
 
 		body, err := ioutil.ReadAll(w.Body)
 
 		require.Nil(t, err)
-		require.Equal(t, string(body), "Only GET allowed\n")
+		require.Equal(t, string(body), "hello-world")
 
 		result.Body.Close()
 	})
