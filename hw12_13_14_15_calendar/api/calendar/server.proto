@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package grpcserver;
+
+option go_package = "./internal/server/grpc/gen;grpcserver";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service GRPCServer {
+    rpc CreateEvent(Event) returns (IDEvent) {}
+    rpc UpdateEvent(Event) returns (google.protobuf.Empty) {}
+    rpc DeleteEvent(IDEvent) returns (google.protobuf.Empty) {}
+    rpc ListEventsToDay(DateTime) returns (Events) {}
+    rpc ListEventsToWeek(DateTime) returns (Events) {}
+    rpc ListEventsToMonth(DateTime) returns (Events) {}
+}
+
+message IDEvent {
+    uint64 id = 1;
+}
+
+message Event {
+    uint64 id = 1;
+    string title = 2;
+    google.protobuf.Timestamp start_time = 3;
+    google.protobuf.Timestamp end_time = 4;
+    string description = 5;
+    uint64 user_id = 6;
+    google.protobuf.Timestamp notification_time = 7;
+}
+
+message Events {
+    repeated Event event = 1;
+}
+
+message DateTime {
+    google.protobuf.Timestamp dt = 1;
+}
