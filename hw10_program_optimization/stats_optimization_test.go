@@ -50,6 +50,8 @@ func TestGetDomainStat_Time_And_Memory(t *testing.T) {
 
 // go test -v -count=1 -timeout=30s -bench=. -benchmem -tags bench .
 func BenchmarkGetDomainStat(b *testing.B) {
+	b.StopTimer()
+
 	data := `{"Id":1,"Name":"Howard Mendoza","Username":"0Oliver","Email":"aliquid_qui_ea@Browsedrive.gov",
 	"Phone":"6-866-899-36-79","Password":"InAQJvsq","Address":"Blackbird Place 25"}
 {"Id":2,"Name":"Jesse Vasquez","Username":"qRichardson","Email":"mLynch@broWsecat.com",
@@ -60,9 +62,14 @@ func BenchmarkGetDomainStat(b *testing.B) {
 "Phone":"520-04-16","Password":"r639qLNu","Address":"Sunfield Park 20"}
 {"Id":5,"Name":"Janice Rose","Username":"KeithHart","Email":"nulla@Linktype.com",
 "Phone":"146-91-01","Password":"acSBF5","Address":"Russell Trail 61"}`
+
+	b.StartTimer()
+
 	for i := 0; i < b.N; i++ {
 		GetDomainStat(bytes.NewBufferString(data), "com")
 	}
+
+	b.StopTimer()
 }
 
 var expectedBizStat = DomainStat{
