@@ -1,15 +1,17 @@
+//go:build !bench
 // +build !bench
 
 package hw10programoptimization
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetDomainStat(t *testing.T) {
+func TestGetDomainStatFunc(t *testing.T) {
 	data := `{"Id":1,"Name":"Howard Mendoza","Username":"0Oliver","Email":"aliquid_qui_ea@Browsedrive.gov","Phone":"6-866-899-36-79","Password":"InAQJvsq","Address":"Blackbird Place 25"}
 {"Id":2,"Name":"Jesse Vasquez","Username":"qRichardson","Email":"mLynch@broWsecat.com","Phone":"9-373-949-64-00","Password":"SiZLeNSGn","Address":"Fulton Hill 80"}
 {"Id":3,"Name":"Clarence Olson","Username":"RachelAdams","Email":"RoseSmith@Browsecat.com","Phone":"988-48-97","Password":"71kuz3gA5w","Address":"Monterey Park 39"}
@@ -36,4 +38,16 @@ func TestGetDomainStat(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, DomainStat{}, result)
 	})
+}
+
+func TestEmptyDomain(t *testing.T) {
+	_, err := GetDomainStat(strings.NewReader(""), "")
+	GetDomainStat(strings.NewReader(""), "")
+	require.Error(t, err)
+}
+
+func TestEmptyReader(t *testing.T) {
+	res, err := GetDomainStat(strings.NewReader(""), "gov")
+	require.Empty(t, res)
+	require.NoError(t, err)
 }
