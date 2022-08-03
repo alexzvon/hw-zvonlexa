@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// go test -v -count=1 -race -timeout=1m . -run TestGetDomainStatFunc
 func TestGetDomainStatFunc(t *testing.T) {
 	data := `{"Id":1,"Name":"Howard Mendoza","Username":"0Oliver","Email":"aliquid_qui_ea@Browsedrive.gov","Phone":"6-866-899-36-79","Password":"InAQJvsq","Address":"Blackbird Place 25"}
 {"Id":2,"Name":"Jesse Vasquez","Username":"qRichardson","Email":"mLynch@broWsecat.com","Phone":"9-373-949-64-00","Password":"SiZLeNSGn","Address":"Fulton Hill 80"}
@@ -35,21 +34,18 @@ func TestGetDomainStatFunc(t *testing.T) {
 	})
 
 	t.Run("find 'unknown'", func(t *testing.T) {
-		//result, err := GetDomainStat(bytes.NewBufferString(data), "unknown")
-		_, err := GetDomainStat(bytes.NewBufferString(data), "unknown")
+		result, err := GetDomainStat(bytes.NewBufferString(data), "unknown")
 		require.NoError(t, err)
-		//		require.Equal(t, DomainStat{}, result)
+		require.Equal(t, DomainStat{}, result)
 	})
 }
 
-// go test -v -count=1 -race -timeout=1m . -run TestEmptyDomain
 func TestEmptyDomain(t *testing.T) {
-	//	_, err := GetDomainStat(strings.NewReader(""), "")
+	_, err := GetDomainStat(strings.NewReader(""), "")
 	GetDomainStat(strings.NewReader(""), "")
-	//	require.Error(t, err)
+	require.Error(t, err)
 }
 
-// go test -v -count=1 -race -timeout=1m . -run TestEmptyReader
 func TestEmptyReader(t *testing.T) {
 	res, err := GetDomainStat(strings.NewReader(""), "gov")
 	require.Empty(t, res)
