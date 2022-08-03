@@ -1,3 +1,6 @@
+//go:build bench
+// +build bench
+
 package hw10programoptimization
 
 import (
@@ -16,6 +19,7 @@ const (
 	timeLimit = 300 * time.Millisecond
 )
 
+// go test -v -count=1 -timeout=30s -tags bench .
 func TestGetDomainStat_Time_And_Memory(t *testing.T) {
 	bench := func(b *testing.B) {
 		b.Helper()
@@ -61,10 +65,12 @@ func BenchmarkGetDomainStat(b *testing.B) {
 {"Id":5,"Name":"Janice Rose","Username":"KeithHart","Email":"nulla@Linktype.com",
 "Phone":"146-91-01","Password":"acSBF5","Address":"Russell Trail 61"}`
 
-	b.StartTimer()
+	r := bytes.NewBufferString(data)
+
+	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		GetDomainStat(bytes.NewBufferString(data), "com")
+		GetDomainStat(r, "com")
 	}
 
 	b.StopTimer()
