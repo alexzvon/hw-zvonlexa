@@ -16,7 +16,6 @@ const (
 	timeLimit = 300 * time.Millisecond
 )
 
-// go test -v -count=1 -timeout=30s -tags bench .
 func TestGetDomainStat_Time_And_Memory(t *testing.T) {
 	bench := func(b *testing.B) {
 		b.Helper()
